@@ -1,0 +1,4 @@
+[binding_model=by_value, include="thinkpad_led_control.h"] class ThinkpadLedControl {
+	ThinkpadLedControl();
+	void ControlLed(int led, std::string command);
+};
