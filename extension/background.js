@@ -67,12 +67,123 @@ VisibleWindows.prototype = {
 };
 var visibleWindows = new VisibleWindows();
 
+var Tab = function(blinklight, tab) {
+	this.blinklight = blinklight;
+	this.id = tab.id;
+	this.urgent = false;
+};
+Tab.prototype = {
+	_scheduleLedUpdate: function() {
+		if (this._ledUpdateScheduled)
+			return;
+
+		setTimeout(function() {
+			var urgent = false;
+
+			for (var id in this.blinklight.tabs)
+				if (this.blinklight.tabs[id].urgent) {
+					urgent = true;
+					break;
+				}
+
+			this.blinklight.ledControl.controlLed(0, urgent ? 'blink' : 'on');
+			this._ledUpdateScheduled = false;
+		}.bind(this), 0);
+
+		this._ledUpdateScheduled = true;
+	},
+	setUrgent: function(value) {
+		if (this.urgent == value)
+			return;
+
+		this.urgent = value;
+		this._scheduleLedUpdate();
+	}
+};
+
+var PinnedTab = function(tab) {
+	Tab.apply(this, arguments);
+
+	if (tab.status == 'complete' && !(tab.id in this.blinklight.injectedTabs))
+		this.blinklight.injectScript(tab.id);
+};
+PinnedTab.prototype = {
+	__proto__: Tab.prototype,
+	onComplete: function() {
+		this.blinklight.injectScript(this.id);
+	},
+	onActivated: function(info) {
+		if (!this.urgent)
+			return;
+
+		visibleWindows.getAll(function(windows) {
+			if (windows.indexOf(info.windowId) != -1)
+				this.setUrgent(false);
+		}.bind(this));
+	},
+	onMessage: function(msg, sender) {
+		if (!sender.tab.active) {
+			this.setUrgent(true);
+			return;
+		}
+
+		visibleWindows.getAll(function(windows, onAdded) {
+			if (windows.indexOf(sender.tab.windowId) != -1)
+				return;
+
+			this.setUrgent(true);
+
+			if (this.blinklight.onVisibleWindowsAdded)
+				return;
+
+			this.blinklight.onVisibleWindowsAdded = function(windows) {
+				chrome.tabs.query({active: true}, function(tabs) {
+					var removeListener = true;
+
+					for (var i = 0; i < tabs.length; i++) {
+						var tab = this.blinklight.tabs[tabs[i].id];
+
+						if (!(tab instanceof PinnedTab))
+							continue;
+
+						if (windows.indexOf(tabs[i].windowId) != -1) {
+							tab.setUrgent(false);
+							continue;
+						}
+
+						if (tab.urgent)
+							removeListener = false;
+					}
+
+					if (removeListener) {
+						onAdded.removeListener(this.blinklight.onVisibleWindowsAdded);
+						delete this.blinklight.onVisibleWindowsAdded;
+					}
+				}.bind(this));
+			}.bind(this);
+			onAdded.addListener(this.blinklight.onVisibleWindowsAdded);
+		}.bind(this));
+	}
+};
+
+var IRCCloudTab = function() {
+	Tab.apply(this, arguments);
+};
+IRCCloudTab.prototype = {
+	__proto__: Tab.prototype,
+	onComplete: function() {},
+	onActivated: function() {},
+	onMessage: function(msg, sender) {
+		this.setUrgent(msg);
+	}
+};
+
 var Blinklight = function() {
-	this.pinnedTabs = {};
+	this.tabs = {};
 	this.injectedTabs = {};
 	this.ledControl = this.getLedControl();
 
-	chrome.tabs.query({pinned: true}, this.onInitialTabs.bind(this));
+	chrome.tabs.query({}, this.onInitialTabs.bind(this));
 	chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 };
 Blinklight.prototype = {
@@ -82,40 +193,30 @@ Blinklight.prototype = {
 		document.documentElement.appendChild(plugin);
 		return plugin.ThinkpadLedControl();
 	},
-	add: function(tab) {
-		this.pinnedTabs[tab.id] = {urgent: false};
+	add: function(tab, urgent) {
+		var tab;
 
-		if (tab.status == 'complete' && !(tab.id in this.injectedTabs))
-			this.injectScript(tab.id);
+		if (tab.url.indexOf('https://www.irccloud.com/') == 0)
+			tab = new IRCCloudTab(this, tab);
+		else if (tab.pinned)
+			tab = new PinnedTab(this, tab);
+		else
+			return;
+
+		if (typeof urgent != 'undefined')
+			tab.setUrgent(urgent);
+
+		this.tabs[tab.id] = tab;
 	},
 	remove: function(id) {
-		if (id in this.pinnedTabs) {
-			this.setUrgent(id, false);
-			delete this.pinnedTabs[id];
+		if (id in this.tabs) {
+			this.tabs[id].setUrgent(false);
+			delete this.tabs[id];
 		}
 	},
 	injectScript: function(id) {
 		chrome.tabs.executeScript(id, {file: 'content_generic.js'});
 		this.injectedTabs[id] = null;
-	},
-	setUrgent: function(id, value) {
-		var pinnedTab = this.pinnedTabs[id];
-
-		if (pinnedTab.urgent == value)
-			return;
-
-		pinnedTab.urgent = value;
-
-		if (value) {
-			this.ledControl.controlLed(0, 'blink');
-			return;
-		}
-
-		for (var id in this.pinnedTabs)
-			if (this.pinnedTabs[id].urgent)
-				return;
-
-		this.ledControl.controlLed(0, 'on');
 	},
 	onInitialTabs: function(tabs) {
 		for (var i = 0; i < tabs.length; i++)
@@ -127,75 +228,33 @@ Blinklight.prototype = {
 		chrome.tabs.onActivated.addListener(this.onActivated.bind(this));
 	},
 	onCreated: function(tab) {
-		if (tab.pinned)
-			this.add(tab);
+		this.add(tab);
 	},
 	onUpdated: function(id, info, tab) {
 		if (info.status == 'loading')
 			delete this.injectedTabs[id];
 
-		if (info.status == 'complete' && id in this.pinnedTabs)
-			this.injectScript(id);
+		if (info.status == 'complete' && id in this.tabs)
+			this.tabs[id].onComplete();
 
-		if ('pinned' in info)
-			if (info.pinned)
-				this.add(tab);
-			else {
-				this.remove(id);
-			}
+		if ('pinned' in info || 'url' in info) {
+			var urgent = (this.tabs[id] || {}).urgent;
+
+			this.remove(id);
+			this.add(tab, urgent);
+		}
 	},
 	onRemoved: function(id) {
 		this.remove(id);
 		delete this.injectedTabs[id];
 	},
 	onActivated: function(info) {
-		if (!(info.tabId in this.pinnedTabs))
-			return;
-		if (!this.pinnedTabs[info.tabId].urgent)
-			return;
-
-		visibleWindows.getAll(function(windows) {
-			if (windows.indexOf(info.windowId) != -1)
-				this.setUrgent(info.tabId, false);
-		}.bind(this));
+		if (info.tabId in this.tabs)
+			this.tabs[info.tabId].onActivated(info);
 	},
 	onMessage: function(msg, sender) {
-		if (!(sender.tab.id in this.pinnedTabs))
-			return;
-
-		if (!sender.tab.active) {
-			this.setUrgent(sender.tab.id, true);
-			return;
-		}
-
-		visibleWindows.getAll(function(windows, onAdded) {
-			if (windows.indexOf(sender.tab.windowId) != -1)
-				return;
-
-			this.setUrgent(sender.tab.id, true);
-
-			if (this.onVisibleWindowsAdded)
-				return;
-
-			this.onVisibleWindowsAdded = function(windows) {
-				chrome.tabs.query({pinned: true, active: true}, function(tabs) {
-					var removeListener = true;
-
-					for (var i = 0; i < tabs.length; i++) {
-						if (windows.indexOf(tabs[i].windowId) != -1)
-							this.setUrgent(tabs[i].id, false);
-						else if (this.pinnedTabs[tabs[i].id].urgent)
-							removeListener = false;
-					}
-
-					if (removeListener) {
-						onAdded.removeListener(this.onVisibleWindowsAdded);
-						delete this.onVisibleWindowsAdded;
-					}
-				}.bind(this));
-			}.bind(this);
-			onAdded.addListener(this.onVisibleWindowsAdded);
-		}.bind(this));
+		if (sender.tab.id in this.tabs)
+			this.tabs[sender.tab.id].onMessage(msg, sender);
 	}
 };
 var blinklight = new Blinklight();

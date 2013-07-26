@@ -1,6 +1,6 @@
 {
 	"name": "blinklight",
-	"version": "1.0",
+	"version": "1.1",
 	"description": "LED notification for urgent tabs on Thinkpad X230",
 	"homepage_url": "https://github.com/wallunit/chrome-blinklight",
 	"permissions": [
@@ -12,6 +12,12 @@
 			"background.js"
 		]
 	},
+	"content_scripts": [
+		{
+			"matches": ["https://www.irccloud.com/"],
+			"js": ["content_irccloud.js"]
+		}
+	],
 	"plugins": [
 		{"path": "npapi-thinkpad-led-control.so"}
 	],
