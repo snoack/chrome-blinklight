@@ -166,15 +166,24 @@ PinnedTab.prototype = {
 	}
 };
 
-var IRCCloudTab = function() {
+var SpecialTab = function() {
 	Tab.apply(this, arguments);
+	this._components = {};
 };
-IRCCloudTab.prototype = {
+SpecialTab.prototype = {
 	__proto__: Tab.prototype,
 	onComplete: function() {},
 	onActivated: function() {},
 	onMessage: function(msg, sender) {
-		this.setUrgent(msg);
+		this._components[msg.component] = msg.urgent;
+
+		for (var component in this._components)
+			if (this._components[component]) {
+				this.setUrgent(true);
+				return;
+			}
+
+		this.setUrgent(false);
 	}
 };
 
@@ -196,8 +205,8 @@ Blinklight.prototype = {
 	add: function(tab, urgent) {
 		var tab;
 
-		if (tab.url.indexOf('https://www.irccloud.com/') == 0)
-			tab = new IRCCloudTab(this, tab);
+		if (/^https:\/\/(www.irccloud.com\/($|[?#])|mail.google.com\/mail\/|plus.google.com\/)/.test(tab.url))
+			tab = new SpecialTab(this, tab);
 		else if (tab.pinned)
 			tab = new PinnedTab(this, tab);
 		else

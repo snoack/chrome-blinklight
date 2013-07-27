@@ -1,33 +1,27 @@
 (function() {
-	var sidebar = document.getElementById('sidebar');
+	var IRCCloud = function() {
+		Component.apply(this, arguments);
+	};
+	IRCCloud.prototype = {
+		__proto__: Component.prototype,
+		findElement: function() {
+			return document.getElementById('buffers');
+		},
+		isUrgent: function(el) {
+			var badges = el.getElementsByClassName('badge');
 
-	if (!sidebar)
-		return;
+			for (var i = 0; i < badges.length; i++)
+				if (badges[i].innerHTML)
+					return true;
 
-	var isAlreadyUrgent = false;
-	var checkUrgent = function() {
-		var badges = sidebar.getElementsByClassName('badge');
-		var urgent = false;
-
-		for (var i = 0; i < badges.length; i++)
-			if (badges[i].innerHTML) {
-				urgent = true;
-				break;
-			}
-
-		if (isAlreadyUrgent != urgent) {
-			chrome.runtime.sendMessage(urgent);
-			isAlreadyUrgent = urgent;
+			return false;
+		},
+		mutationObserverOptions: {
+			childList: true,
+			subtree: true
 		}
 	};
 
-	checkUrgent();
-
-	(new MutationObserver(function(mutations) {
-		checkUrgent();
-	})).observe(sidebar, {
-		childList: true,
-		subtree: true
-	});
+	observeComponents([new IRCCloud()]);
 })();
 
