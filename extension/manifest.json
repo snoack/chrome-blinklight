@@ -1,7 +1,7 @@
 {
 	"name": "blinklight",
 	"version": "1.1",
-	"description": "LED notification for urgent tabs on Thinkpad X230",
+	"description": "LED notification for urgent tabs on Thinkpads",
 	"homepage_url": "https://github.com/wallunit/chrome-blinklight",
 	"permissions": [
 		"tabs",
