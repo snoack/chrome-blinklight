@@ -32,7 +32,8 @@
 		}
 	],
 	"plugins": [
-		{"path": "npapi-thinkpad-led-control.so"}
+		{"path": "npapi-thinkpad-led-control-linux32.so"},
+		{"path": "npapi-thinkpad-led-control-linux64.so"}
 	],
 	"minimum_chrome_version": "26",
 	"manifest_version": 2
