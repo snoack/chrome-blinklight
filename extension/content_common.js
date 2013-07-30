@@ -1,5 +1,7 @@
 Component = function() {
-	this.urgent = false;
+	this.n = 0;
+
+	chrome.runtime.sendMessage({component: this.name, urgent: false});
 };
 Component.prototype = {
 	name: null,
@@ -14,12 +16,15 @@ Component.prototype = {
 		);
 	},
 	check: function(el) {
-		var urgent = this.isUrgent(el);
+		var n = this.count(el);
 
-		if (this.urgent != urgent) {
-			chrome.runtime.sendMessage({component: this.name, urgent: urgent});
-			this.urgent = urgent;
-		}
+		if (n == 0 && this.n != 0)
+			chrome.runtime.sendMessage({component: this.name, urgent: false});
+
+		for (var i = this.n; i < n; i++)
+			chrome.runtime.sendMessage({component: this.name, urgent: true});
+
+		this.n = n;
 	},
 	prepareElementForMutationObserverCallback: function(el) {
 		return el;

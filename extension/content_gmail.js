@@ -8,8 +8,8 @@
 		findElement: function() {
 			return document.querySelector('a.J-Ke[href$="#inbox"]');
 		},
-		isUrgent: function(el) {
-			return / \(\d+\)/.test(el.innerText);
+		count: function(el) {
+			return parseInt((el.innerText.match(/\((\d+)\)/) || [null, 0])[1]);
 		},
 		mutationObserverOptions: {
 			childList: true,
@@ -38,8 +38,8 @@
 		findElement: function() {
 			return document.getElementsByClassName('aj3')[0];
 		},
-		isUrgent: function(el) {
-			return el.getElementsByClassName('vE').length > 0;
+		count: function(el) {
+			return el.getElementsByClassName('vE').length;
 		},
 		mutationObserverOptions: {
 			attributes: true,

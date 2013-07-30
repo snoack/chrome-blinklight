@@ -1,4 +1,7 @@
 (function() {
+	if (document.location.hash != '#e') // only roster
+		return;
+
 	if (document.referrer.indexOf('https://mail.google.com/mail/') != 0)
 	if (document.referrer.indexOf('https://plus.google.com/') != 0)
 		return;
@@ -12,8 +15,8 @@
 		findElement: function() {
 			return document.getElementsByClassName('Ln')[0];
 		},
-		isUrgent: function(el) {
-			return el.getElementsByClassName('ee').length > 0;
+		count: function(el) {
+			return el.getElementsByClassName('ee').length;
 		},
 		mutationObserverOptions: {
 			attributes: true,

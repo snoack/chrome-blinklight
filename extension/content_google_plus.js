@@ -8,9 +8,9 @@
 		findElement: function() {
 			return document.getElementsByClassName('gbtn')[0];
 		},
-		isUrgent: function(el) {
+		count: function(el) {
 			var notifications = el.getElementsByClassName('gb_na')[0];
-			return !!+(notifications && notifications.innerText);
+			return parseInt(notifications && notifications.innerText) || 0;
 		},
 		mutationObserverOptions: {
 			attributes: true,

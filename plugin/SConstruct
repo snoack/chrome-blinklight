@@ -1,8 +1,8 @@
 import os
 import sys
 
-IDL_SOURCES=['thinkpad_led_control.idl']
-SOURCES=['thinkpad_led_control.cc', 'plugin.cc']
+IDL_SOURCES=['led_control.idl']
+SOURCES=['led_control.cc', 'plugin.cc']
 STATIC_GLUE_SOURCES=['common.cc', 'npn_api.cc', 'static_object.cc', 'main.cc']
 
 env = Environment(
@@ -44,5 +44,5 @@ env['BUILDERS']['Nixysa'] = Builder(action=NIXYSA_CMDLINE,
 AUTOGEN_OUTPUT = env.Nixysa(IDL_SOURCES)
 AUTOGEN_CC_FILES = [f for f in AUTOGEN_OUTPUT if f.suffix == '.cc']
 
-env.SharedLibrary('thinkpad-led-control', AUTOGEN_CC_FILES + SOURCES +
+env.SharedLibrary('led-control', AUTOGEN_CC_FILES + SOURCES +
 				  ['$STATIC_GLUE_DIR/' + f for f in STATIC_GLUE_SOURCES])

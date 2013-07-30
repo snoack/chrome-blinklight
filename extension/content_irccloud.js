@@ -7,14 +7,14 @@
 		findElement: function() {
 			return document.getElementById('buffers');
 		},
-		isUrgent: function(el) {
+		count: function(el) {
 			var badges = el.getElementsByClassName('badge');
+			var n = 0;
 
 			for (var i = 0; i < badges.length; i++)
-				if (badges[i].innerHTML)
-					return true;
+				n += parseInt(badges[i].innerText) || 0;
 
-			return false;
+			return n;
 		},
 		mutationObserverOptions: {
 			childList: true,

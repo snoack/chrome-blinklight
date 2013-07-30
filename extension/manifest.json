@@ -1,15 +1,19 @@
 {
 	"name": "blinklight",
-	"version": "1.1",
-	"description": "LED notification for urgent tabs on Thinkpads",
+	"version": "1.2",
+	"description": "LED notification for urgent tabs",
 	"homepage_url": "https://github.com/wallunit/chrome-blinklight",
 	"permissions": [
 		"tabs",
+		"storage",
 		"<all_urls>"
 	],
 	"background": {
 		"scripts": [
-			"background.js"
+			"visible_windows.js",
+			"led.js",
+			"tabs.js",
+			"blinklight.js"
 		]
 	},
 	"content_scripts": [
@@ -31,9 +35,10 @@
 			"all_frames": true
 		}
 	],
+	"options_page": "options.html",
 	"plugins": [
-		{"path": "npapi-thinkpad-led-control-linux32.so"},
-		{"path": "npapi-thinkpad-led-control-linux64.so"}
+		{"path": "npapi-led-control-linux32.so"},
+		{"path": "npapi-led-control-linux64.so"}
 	],
 	"minimum_chrome_version": "26",
 	"manifest_version": 2

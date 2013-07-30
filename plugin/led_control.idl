@@ -1,0 +1,13 @@
+[binding_model=by_pointer, include="led_control.h"] class Led {
+	[getter] std::string led;
+	[getter, setter] unsigned int brightness;
+	[getter, setter] std::string trigger;
+	[getter] std::string[] availableTriggers;
+	[getter] bool canControl;
+};
+
+[binding_model=by_value, include="led_control.h"] class LedControl {
+	LedControl();
+	Led? GetLed(std::string led);
+	Led[] GetAllLeds();
+};
