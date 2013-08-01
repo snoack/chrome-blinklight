@@ -91,10 +91,7 @@
 		chrome.storage.local.get(['led', 'behavior'], this._onSettingsRetrieved.bind(this));
 	}
 	LedBehaviorManager.prototype = {
-		_improperlyConfigured: function() {
-			if (this._deferred)
-				return;
-
+		_showOptions: function() {
 			var optionsUrl = chrome.extension.getURL('options.html');
 
 			chrome.tabs.query({url: optionsUrl}, function(tabs) {
@@ -103,22 +100,27 @@
 				else
 					chrome.tabs.create({url: optionsUrl, active: true});
 			});
-
-			delete this._ledBehavior;
 		},
 		_initLedBehavior: function() {
-			clearTimeout(this._timeout);
-			delete this._timeout;
+			if (this._timeout) {
+				clearTimeout(this._timeout);
+				delete this._timeout;
+			}
+
+			if (this._ledBehavior) {
+				this._ledBehavior.restore();
+				delete this._ledBehavior;
+			}
 
 			var led;
 
 			if (!this._settings.led || !(led = this._ledControl.getLed(this._settings.led))) {
-				this._improperlyConfigured();
+				this._showOptions();
 				return;
 			}
 
 			if (!led.canControl) {
-				this._improperlyConfigured();
+				this._showOptions();
 				this._deferInitLedBehavior();
 				return;
 			}
@@ -131,7 +133,7 @@
 					break;
 				case 'blink-permanant':
 					if (led.availableTriggers.indexOf('timer') == -1) {
-						this._improperlyConfigured();
+						this._showOptions();
 						this._deferInitLedBehavior();
 						return;
 					}
@@ -142,12 +144,9 @@
 					ctor = BlinkOnce;
 					break;
 				default:
-					this._improperlyConfigured();
+					this._showOptions();
 					return;
 			}
-
-			if (this._ledBehavior)
-				this._ledBehavior.restore();
 
 			this._ledBehavior = new ctor(led);
 
@@ -158,9 +157,10 @@
 		},
 		_deferInitLedBehavior: function() {
 			this._timeout = setTimeout(function () {
-				this._deferred = true;
+				this._showOptions = function() {};
 				this._initLedBehavior();
-				this._deferred = false;
+
+				delete this._showOptions;
 			}.bind(this), 1000);
 		},
 		_onSettingsRetrieved: function(settings) {
