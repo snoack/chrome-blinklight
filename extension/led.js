@@ -81,13 +81,18 @@
 	};
 
 	LedBehaviorManager = function() {
+		this._urgent = false;
+
 		var plugin = document.createElement("embed");
 		plugin.setAttribute("type", "application/x-led-control");
 		document.body.appendChild(plugin);
 
-		this._ledControl = plugin.LedControl();
-		this._urgent = false;
+		if (!('LedControl' in plugin)) {
+			this._showOptions();
+			return;
+		}
 
+		this._ledControl = plugin.LedControl();
 		chrome.storage.local.get(['led', 'behavior'], this._onSettingsRetrieved.bind(this));
 	}
 	LedBehaviorManager.prototype = {

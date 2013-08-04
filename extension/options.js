@@ -1,7 +1,15 @@
 (function() {
-	var ledControl = document.querySelector('embed[type="application/x-led-control"]').LedControl();
-
+	var plugin = document.querySelector('embed[type="application/x-led-control"]');
 	var form = document.forms[0];
+
+	if (!('LedControl' in plugin)) {
+		document.getElementById('os-not-supported').classList.remove('hidden');
+		form.classList.add('hidden');
+		return;
+	}
+
+	var ledControl = plugin.LedControl();
+
 	var ledSelect = form.elements.namedItem('led');
 	var behaviorRadios = form.elements.namedItem('behavior');
 

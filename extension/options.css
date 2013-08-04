@@ -17,3 +17,7 @@ code span {
 .hidden {
 	display: none;
 }
+
+#os-not-supported {
+	color: red;
+}
