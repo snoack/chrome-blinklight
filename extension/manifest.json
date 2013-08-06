@@ -1,6 +1,6 @@
 {
 	"name": "blinklight",
-	"version": "1.3",
+	"version": "1.4",
 	"description": "LED notification for urgent tabs",
 	"homepage_url": "https://github.com/wallunit/chrome-blinklight",
 	"permissions": [
