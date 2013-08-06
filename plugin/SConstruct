@@ -3,28 +3,27 @@ import sys
 
 IDL_SOURCES=['led_control.idl']
 SOURCES=['led_control.cc', 'plugin.cc']
-STATIC_GLUE_SOURCES=['common.cc', 'npn_api.cc', 'static_object.cc', 'main.cc']
+
+AddOption(
+	'--compat-memcpy',
+	dest='compat-memcpy',
+	action='store_true',
+	help= "if building with glibc >= 2.14, the plugin will be incompatible "
+	      "with glibc < 2.14, if you don't use this option. "
+)
 
 env = Environment(
-	ROOT = '/tmp/nixysa-read-only',
-	NIXYSA_DIR = '$ROOT/nixysa',
-	STATIC_GLUE_DIR = '$NIXYSA_DIR/static_glue/npapi',
-	NPAPI_DIR = '$ROOT/third_party/npapi/include',
-	GLUE_DIR = 'glue',
-	CPPPATH=['.', '$STATIC_GLUE_DIR', '$NPAPI_DIR', '$GLUE_DIR']
+	GLUE_DIR='glue',
+	NIXYSA_DIR='/tmp/nixysa-read-only/nixysa',
+	STATIC_GLUE_DIR='$NIXYSA_DIR/static_glue/npapi',
+	NPAPI_DIR='$NIXYSA_DIR/../third_party/npapi/include',
+	CPPDEFINES=['OS_LINUX'],
+	CPPPATH=['.', '$STATIC_GLUE_DIR', '$NIXYSA_DIR/../third_party/npapi/include', '$GLUE_DIR']
 )
-env.Append(ENV={'PYTHON': sys.executable})
-if sys.platform == 'win32':
-  env.Append(CODEGEN = 'codegen.bat',
-			 CPPDEFINES = ['WIN32', 'OS_WINDOWS'])
-elif sys.platform == 'darwin':
-  env.Append(CODEGEN = 'codegen.sh',
-			 CPPDEFINES = ['XP_MACOSX', 'OS_MACOSX'],
-			 LINKFLAGS = '-framework CoreFoundation -framework IOKit')
 
-else:
-  env.Append(CODEGEN = 'codegen.sh',
-			 CPPDEFINES = ['OS_LINUX'])
+env.Append(ENV={'PYTHON': sys.executable})
+if GetOption('compat-memcpy'):
+	env.Append(CCFLAGS=['-include', 'compat.h'])
 
 def NixysaEmitter(target, source, env):
   bases = [os.path.splitext(s.name)[0] for s in source] + ['globals']
@@ -33,7 +32,7 @@ def NixysaEmitter(target, source, env):
   targets += ['$GLUE_DIR/hash', '$GLUE_DIR/parsetab.py']
   return targets, source
 
-NIXYSA_CMDLINE = ' '.join([env.File('$NIXYSA_DIR/$CODEGEN').abspath,
+NIXYSA_CMDLINE = ' '.join([env.File('$NIXYSA_DIR/codegen.sh').abspath,
 						   '--output-dir=$GLUE_DIR',
 						   '--generate=npapi',
 						   '$SOURCES'])
@@ -41,8 +40,8 @@ NIXYSA_CMDLINE = ' '.join([env.File('$NIXYSA_DIR/$CODEGEN').abspath,
 env['BUILDERS']['Nixysa'] = Builder(action=NIXYSA_CMDLINE,
 									emitter=NixysaEmitter)
 
-AUTOGEN_OUTPUT = env.Nixysa(IDL_SOURCES)
-AUTOGEN_CC_FILES = [f for f in AUTOGEN_OUTPUT if f.suffix == '.cc']
-
-env.SharedLibrary('led-control', AUTOGEN_CC_FILES + SOURCES +
-				  ['$STATIC_GLUE_DIR/' + f for f in STATIC_GLUE_SOURCES])
+env.SharedLibrary('led-control',
+	[f for f in env.Nixysa(IDL_SOURCES) if f.suffix == '.cc'] +
+	map(env.File, SOURCES) +
+	env.Dir('$STATIC_GLUE_DIR').glob('*.cc')
+)
