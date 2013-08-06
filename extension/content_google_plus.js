@@ -9,11 +9,12 @@
 			return document.getElementsByClassName('gbtn')[0];
 		},
 		count: function(el) {
-			var notifications = el.getElementsByClassName('gb_na')[0];
+			var notifications = el.getElementsByClassName('gb_da')[0];
 			return parseInt(notifications && notifications.innerText) || 0;
 		},
 		mutationObserverOptions: {
-			attributes: true,
+			childList: true,
+			characterData: true,
 			subtree: true
 		}
 	};
