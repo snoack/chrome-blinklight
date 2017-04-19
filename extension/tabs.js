@@ -5,31 +5,11 @@
     this.urgent = false;
   };
   Tab.prototype = {
-    _scheduleLedUpdate: function() {
-      if (this._ledUpdateScheduled)
-        return;
-
-      setTimeout(function() {
-        var urgent = false;
-
-        for (var id in this.blinklight.tabs)
-          if (this.blinklight.tabs[id].urgent) {
-            urgent = true;
-            break;
-          }
-
-        this.blinklight.ledBehaviorManager.notify()
-        this.blinklight.ledControl.controlLed(0, urgent ? 'blink' : 'on');
-        this._ledUpdateScheduled = false;
-      }.bind(this), 0);
-
-      this._ledUpdateScheduled = true;
-    },
     setUrgent: function(value) {
       this.urgent = value;
 
       if (value) {
-        this.blinklight.ledBehaviorManager.notify();
+        this.blinklight.ledControl.notify();
         return;
       }
 
@@ -37,7 +17,7 @@
         if (this.blinklight.tabs[id].urgent)
           return;
 
-      this.blinklight.ledBehaviorManager.clear();
+      this.blinklight.ledControl.clear();
     }
   };
 

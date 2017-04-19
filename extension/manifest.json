@@ -1,11 +1,12 @@
 {
   "name": "blinklight",
   "version": "1.4",
-  "description": "LED notification for urgent tabs",
-  "homepage_url": "https://github.com/wallunit/chrome-blinklight",
+  "description": "LED notification of urgent tabs on Linux",
+  "homepage_url": "https://github.com/snoack/chrome-blinklight",
   "permissions": [
     "tabs",
     "storage",
+    "nativeMessaging",
     "<all_urls>"
   ],
   "background": {
@@ -35,11 +36,14 @@
       "all_frames": true
     }
   ],
-  "options_page": "options.html",
-  "plugins": [
-    {"path": "npapi-led-control-linux32.so"},
-    {"path": "npapi-led-control-linux64.so"}
-  ],
-  "minimum_chrome_version": "26",
-  "manifest_version": 2
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
+  "icons": {
+    "64": "icon.png"
+  },
+  "minimum_chrome_version": "42",
+  "manifest_version": 2,
+  "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCprfGX9/itvOCSKlq82T3+YW6kuO/kuggH6AniK3tvfYz+pa4RFOLWxf7q60zWF3uYKzpJj2O3/zmH6FrjGy+cxWDvrChH4c45eTTZNC99l9Xz8/FBsupQHYUBP2FUiLnJ5eHAgAPjSOnAUQSfy+Jhi6fRCpTXX1bPQ8S4Henq4QIDAQAB"
 }

@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+# The hardening flags added by debhelper cause some overeager unused-result
+# warnings, and since we use -Werror as well, the build will fail, unless we
+# disable these warnings.
+export DEB_CPPFLAGS_MAINT_APPEND = -Wno-unused-result
+
+%:
+	dh $@ --with=autoreconf --sourcedirectory=native-messaging-host
+
+# --with-static-jsonc: Newer Debian releases provide libjson-c.so.3 with
+# the ibjson-c3 package, while older Debian releases provide libjson-c.so.2
+# with the libjson-c2 package. So in order to keep this package compatible
+# with a wide range of Debian releases, we have to link libjson-c statically.
+# --libexecdir=/usr/share: Debian doesn't use /usr/libexec, so we put it
+# in /usr/share instead, which seems where other packages put their helper
+# executables as well.
+override_dh_auto_configure:
+	dh_auto_configure -- --with-static-jsonc --libexecdir=/usr/share
+
+# Prevent the Makefile from setting capabilities. This will fail, while
+# building the package, as it requires root. Furthermore, the capibilities won't
+# make it into the package anyway, and need to be set by a postinst script.
+override_dh_auto_install:
+	dh_auto_install -- nosetcap=1

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = configure ]; then
+  setcap cap_dac_override,cap_sys_module+ep /usr/share/chrome-blinklight/native-messaging-host
+fi
+
+#DEBHELPER#
+
+exit 0

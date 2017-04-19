@@ -1,94 +1,71 @@
-(function() {
-  var plugin = document.querySelector('embed[type="application/x-led-control"]');
-  var form = document.forms[0];
+function getDebLink() {
+  var version = chrome.runtime.getManifest().version;
+  var arch = "i386";
+  if (navigator.platform.includes("x86_64"))
+    arch = "amd64";
+  else if (navigator.platform.includes("aarch64"))
+    arch = "arm64";
+  else if (navigator.platform.includes("armv"))
+    arch = "armhf";
+  return "https://launchpad.net/~s.noack/+archive/ubuntu/ppa/+files/chrome-blinklight_" + version + "_" + arch + ".deb";
+}
 
-  if (!('LedControl' in plugin)) {
-    document.getElementById('os-not-supported').classList.remove('hidden');
-    form.classList.add('hidden');
-    return;
+function checkLedError() {
+  chrome.runtime.sendMessage("get-last-error", function(error) {
+    document.getElementById("led").dataset.error = error;
+  });
+}
+
+function initSettings(leds) {
+  var ledRadios = document.getElementById("leds");
+  var ledTemplate = document.getElementById("template-led");
+
+  leds.sort();
+  for (var i = 0; i < leds.length; i++) {
+    var led = leds[i];
+    var clone = document.importNode(ledTemplate.content, true);
+
+    clone.querySelector("input").value = led;
+    clone.querySelector("span").textContent = led;
+
+    ledRadios.appendChild(clone);
   }
 
-  var ledControl = plugin.LedControl();
-
-  var ledSelect = form.elements.namedItem('led');
-  var behaviorRadios = form.elements.namedItem('behavior');
-
-  var instructions = document.getElementById('instructions');
-  var commands = instructions.getElementsByTagName('code')[0];
-
-  var updateInstructions = function(led) {
-    instructions.classList.add('hidden');
-    commands.innerHTML = '';
-
-    if (!led || !form.querySelector('[name=behavior]:checked'))
-      return;
-
-    if (!led.canControl) {
-      ['brightness', 'trigger'].forEach(function(file) {
-        var cmd = document.createElement('span');
-        cmd.innerText = "chmod a+rw /sys/class/leds/" + led.led + "/" + file;
-        commands.appendChild(cmd);
-      });
-
-      instructions.classList.remove('hidden');
+  chrome.storage.local.get(["led", "trigger"], function(options) {
+    for (var option in options) {
+      var input = document.querySelector("input[name='" + option + "'][value='" + options[option] + "']");
+      if (input)
+        input.checked = true;
     }
 
-    if (form.querySelector('[name=behavior][value=blink-permanant]').checked)
-    if (led.availableTriggers.indexOf('timer') == -1) {
-      var cmd = document.createElement('span');
-      cmd.innerText = 'modprobe ledtrig_timer';
-      commands.appendChild(cmd);
-      instructions.classList.remove('hidden');
+    if ("led" in options)
+      checkLedError();
+  });
+}
+
+function init() {
+  chrome.runtime.sendMessage("get-leds", function(leds) {
+    if (leds) {
+      if (leds.length > 0) {
+        initSettings(leds);
+        document.documentElement.dataset.view = "settings";
+      } else
+        document.documentElement.dataset.view = "no-leds";
     }
-  };
-
-  var updateUI = function(settings) {
-    if (settings.led)
-      ledSelect.value = settings.led;
-
-    if (settings.behavior)
-      form.querySelector('[name=behavior][value=' + settings.behavior + ']').checked = true;
-
-    updateInstructions(ledSelect.value && ledControl.getLed(ledSelect.value));
-  };
-
-  ledControl.getAllLeds().forEach(function(led) {
-    var opt = document.createElement('option');
-    opt.innerText = opt.value = led.led;
-
-    ledSelect.appendChild(opt)
-    ledSelect.value = '';
-    ledSelect.addEventListener('change', function() {
-      if (ledSelect.selectedOptions[0] == opt) {
-        chrome.storage.local.set({led: led.led});
-        updateInstructions(led);
-      }
-    }, false);
+    else if (!/^Linux\b/.test(navigator.platform) || /\bCrOS\b/.test(navigator.userAgent))
+      document.documentElement.dataset.view = "os-not-supported";
+    else {
+      document.documentElement.dataset.view = "connection-failed";
+      setTimeout(init, 1000);
+    }
   });
+}
 
-  for (var i = 0; i < behaviorRadios.length; i++)
-    behaviorRadios[i].addEventListener('change', function(event) {
-      var led;
+init();
 
-      if (!event.target.checked)
-        return;
+document.addEventListener("change", function(event) {
+  chrome.storage.local.set({[event.target.name]: event.target.value});
+  checkLedError();
+}, true);
 
-      if (ledSelect.value && (led = ledControl.getLed(ledSelect.value)))
-        updateInstructions(led);
-
-      chrome.storage.local.set({behavior: event.target.value});
-    }, false);
-
-  chrome.storage.local.get(['led', 'behavior'], function(settings) {
-    updateUI(settings);
-
-    chrome.storage.onChanged.addListener(function(changes) {
-      var settings = {};
-
-      for (var k in changes)
-        settings[k] = changes[k].newValue;
-
-      updateUI(settings);
-    });
-  });
-})();
+document.getElementById("deb-link").href = getDebLink();

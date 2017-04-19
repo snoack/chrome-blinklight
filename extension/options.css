@@ -1,23 +1,37 @@
-input[type=radio] {
-  margin-left: 0;
+html[data-view=settings] body {
+  margin-top: 0;
 }
 
-code {
-  display: block;
-  padding: 0.5em;
-  border: 1px solid #000;
-  background-color: #eee;
-  border-radius: 0.5em;
+label {
+  white-space: nowrap;
 }
 
-code span {
-  display: block;
+.error {
+  background-color: #fee;
+  border: 1px solid #faa;
+  border-radius: 3px;
+  padding: 0.4em 0.8em;
 }
 
-.hidden {
+#settings {
+  display: flex;
+  flex-flow: column;
+}
+
+#leds {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#leds .radio {
+  min-width: 50%;
+}
+
+html:not([data-view=settings]) #settings,
+html:not([data-view=no-leds]) #no-leds,
+html:not([data-view=os-not-supported]) #os-not-supported,
+html:not([data-view=connection-failed]) #connection-failed,
+#led:not([data-error=unkown]) #led-error-unknown,
+#led:not([data-error=locked]) #led-error-locked {
   display: none;
-}
-
-#os-not-supported {
-  color: red;
 }

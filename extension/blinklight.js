@@ -1,7 +1,7 @@
 Blinklight = function() {
   this.tabs = {};
   this.injectedTabs = {};
-  this.ledBehaviorManager = new LedBehaviorManager();
+  this.ledControl = new LedControl();
 
   chrome.tabs.query({}, this.onInitialTabs.bind(this));
   chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
@@ -64,9 +64,19 @@ Blinklight.prototype = {
     if (info.tabId in this.tabs)
       this.tabs[info.tabId].onActivated(info);
   },
-  onMessage: function(msg, sender) {
+  onMessage: function(message, sender, sendResponse) {
+    if (message == "get-leds") {
+      this.ledControl.getLeds(sendResponse);
+      return true;
+    }
+
+    if (message == "get-last-error") {
+      this.ledControl.getLastError(sendResponse);
+      return true;
+    }
+
     if (sender.tab.id in this.tabs)
-      this.tabs[sender.tab.id].onMessage(msg, sender);
+      this.tabs[sender.tab.id].onMessage(message, sender);
   }
 };
 

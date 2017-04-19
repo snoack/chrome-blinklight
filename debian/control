@@ -1,0 +1,12 @@
+Source: chrome-blinklight
+Section: web
+Priority: optional
+Maintainer: Sebastian Noack <sebastian.noack@gmail.com>
+Build-Depends: debhelper (>= 9), dh-autoreconf, libjson-c-dev
+Standards-Version: 3.9.8
+Homepage: https://github.com/snoack/chrome-blinklight
+
+Package: chrome-blinklight
+Architecture: i386 amd64 arm64 armhf
+Depends: ${shlibs:Depends}, ${misc:Depends}, libcap2-bin
+Description: Chrome extension that notifies you about urgent tabs using one of your laptop's LEDs

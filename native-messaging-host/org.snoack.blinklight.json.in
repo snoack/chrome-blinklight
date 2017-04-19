@@ -1,0 +1,7 @@
+{
+  "name": "org.snoack.blinklight",
+  "description": "LED notification of urgent tabs",
+  "path": "@path@",
+  "type": "stdio",
+  "allowed_origins": ["chrome-extension://jiaipmkogklkpmpabagihfledlejmgaf/"]
+}
