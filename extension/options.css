@@ -1,23 +1,23 @@
 input[type=radio] {
-	margin-left: 0;
+  margin-left: 0;
 }
 
 code {
-	display: block;
-	padding: 0.5em;
-	border: 1px solid #000;
-	background-color: #eee;
-	border-radius: 0.5em;
+  display: block;
+  padding: 0.5em;
+  border: 1px solid #000;
+  background-color: #eee;
+  border-radius: 0.5em;
 }
 
 code span {
-	display: block;
+  display: block;
 }
 
 .hidden {
-	display: none;
+  display: none;
 }
 
 #os-not-supported {
-	color: red;
+  color: red;
 }

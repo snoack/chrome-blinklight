@@ -1,45 +1,45 @@
 {
-	"name": "blinklight",
-	"version": "1.4",
-	"description": "LED notification for urgent tabs",
-	"homepage_url": "https://github.com/wallunit/chrome-blinklight",
-	"permissions": [
-		"tabs",
-		"storage",
-		"<all_urls>"
-	],
-	"background": {
-		"scripts": [
-			"visible_windows.js",
-			"led.js",
-			"tabs.js",
-			"blinklight.js"
-		]
-	},
-	"content_scripts": [
-		{
-			"matches": ["https://www.irccloud.com/"],
-			"js": ["content_common.js", "content_irccloud.js"]
-		},
-		{
-			"matches": ["https://mail.google.com/mail/*"],
-			"js": ["content_common.js", "content_gmail.js"]
-		},
-		{
-			"matches": ["https://plus.google.com/*"],
-			"js": ["content_common.js", "content_google_plus.js"]
-		},
-		{
-			"matches": ["https://talkgadget.google.com/u/*/talkgadget/_/frame*"],
-			"js": ["content_common.js", "content_hangout.js"],
-			"all_frames": true
-		}
-	],
-	"options_page": "options.html",
-	"plugins": [
-		{"path": "npapi-led-control-linux32.so"},
-		{"path": "npapi-led-control-linux64.so"}
-	],
-	"minimum_chrome_version": "26",
-	"manifest_version": 2
+  "name": "blinklight",
+  "version": "1.4",
+  "description": "LED notification for urgent tabs",
+  "homepage_url": "https://github.com/wallunit/chrome-blinklight",
+  "permissions": [
+    "tabs",
+    "storage",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": [
+      "visible_windows.js",
+      "led.js",
+      "tabs.js",
+      "blinklight.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.irccloud.com/"],
+      "js": ["content_common.js", "content_irccloud.js"]
+    },
+    {
+      "matches": ["https://mail.google.com/mail/*"],
+      "js": ["content_common.js", "content_gmail.js"]
+    },
+    {
+      "matches": ["https://plus.google.com/*"],
+      "js": ["content_common.js", "content_google_plus.js"]
+    },
+    {
+      "matches": ["https://talkgadget.google.com/u/*/talkgadget/_/frame*"],
+      "js": ["content_common.js", "content_hangout.js"],
+      "all_frames": true
+    }
+  ],
+  "options_page": "options.html",
+  "plugins": [
+    {"path": "npapi-led-control-linux32.so"},
+    {"path": "npapi-led-control-linux64.so"}
+  ],
+  "minimum_chrome_version": "26",
+  "manifest_version": 2
 }
