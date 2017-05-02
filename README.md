@@ -1,31 +1,25 @@
 chrome-blinklight
 =================
 
-This is an extension for Google Chrome that makes an LED of your laptop
-running Linux, blink while...
+This is an extension for Google Chrome on Linux that notifies you about new
+content (such as unread messages) in pinned tabs, using one of your laptop's
+LEDs, like the power button on newer ThinkPads, or the ThinkLight on older models.
 
-### Gmail
-* you have unread emails in your inbox
-* you got a message via Hangouts
-* you got a message via Google Talk
+Most interactive websites, like mail and chat web apps, change their title in
+order to indicate new messages. If that happens in a pinned tab in the
+background, Chrome flashes that tab, in order to get your attention. With this
+extension, in addition, an LED will be used, in order to indicate that a pinned
+tab's title has changed. This is in particular useful, when the browser window
+is minimized or on another workspace.
 
-### Google Plus
-* you have unread notifications
-* you got a message via Hangouts
-
-### IRCCloud
-* your nick was mentionen in a chat
-* you got a private message
-
-### Pinned tabs
-* the title has changed (similar to the built-in behavior in Chrome of flashing pinned tabs)
+In order to pin a tab, right click on the tab and choose "Pin tab".
 
 Installation
 ------------
 
 chrome-blinklight consists of two parts, a Chrome extension that observes
-tabs for the above events, and a native host application that controls the LED.
-In order for chrome-blinklight to work, both have to be installed.
+pinned tabs, and a native host application that controls the LED. In order
+for chrome-blinklight to work, both have to be installed.
 
 ### On Debian/Ubuntu
 
