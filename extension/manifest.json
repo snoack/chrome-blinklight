@@ -1,6 +1,6 @@
 {
   "name": "blinklight",
-  "version": "2.0",
+  "version": "2.1",
   "description": "LED notification of urgent tabs on Linux",
   "homepage_url": "https://github.com/snoack/chrome-blinklight",
   "permissions": [

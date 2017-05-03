@@ -1,3 +1,10 @@
+chrome-blinklight (2.1) zesty; urgency=medium
+
+  * Fixed build.
+  * Improved icon.
+
+ -- Sebastian Noack <sebastian.noack@gmail.com>  Wed, 03 May 2017 20:47:20 +0200
+
 chrome-blinklight (2.0) zesty; urgency=medium
 
   * Initial package
