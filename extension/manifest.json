@@ -21,7 +21,8 @@
     "chrome_style": true
   },
   "icons": {
-    "64": "icon.png"
+    "32": "icon-32.png",
+    "128": "icon-128.png"
   },
   "minimum_chrome_version": "42",
   "manifest_version": 2,
