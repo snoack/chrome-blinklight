@@ -269,7 +269,7 @@ int main()
   while (poll(fds, 2, -1) >= 0 && fds[1].revents == 0 &&
          read(STDIN_FILENO, &input_len, sizeof(input_len)) == sizeof(input_len) &&
          (input = malloc(input_len)) != NULL &&
-         read(STDIN_FILENO, input, input_len) == input_len) {
+         read(STDIN_FILENO, input, input_len) == (ssize_t) input_len) {
     json_object *jobj_input;
     json_object *jobj_output = NULL;
     const char *output;
