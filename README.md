@@ -23,12 +23,11 @@ for chrome-blinklight to work, both have to be installed.
 
 ### On Debian/Ubuntu
 
-A Debian package is available from the author's PPA. If you are running Debian
-or Ubuntu, just run following commands as *root* (or with `sudo`):
+A package is available from the author's PPA, which can be installed by running
+following commands (as root):
 
 ```
 add-apt-repository ppa:s.noack/ppa
-sed -i "s/$(lsb_release -cs)/zesty/g" /etc/apt/sources.list.d/s_noack-ppa-*.list
 apt-get update
 apt-get install chrome-blinklight
 ```
@@ -51,7 +50,7 @@ autoreconf --install
 make
 ```
 
-Then, install the host application, by running following command as *root*:
+Then, install the host application, by running following command (as root):
 
 ```
 make install
