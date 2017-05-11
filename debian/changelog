@@ -1,3 +1,11 @@
+chrome-blinklight (2.2) zesty; urgency=medium
+
+  * Added Firefox support
+  * Fixed hidden error message
+  * Detect OS and architecture in a more reliable way
+
+ -- Sebastian Noack <sebastian.noack@gmail.com>  Thu, 11 May 2017 20:20:00 +0200
+
 chrome-blinklight (2.1) zesty; urgency=medium
 
   * Fixed build.
