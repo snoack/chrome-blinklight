@@ -1,11 +1,12 @@
-function getDebLink() {
+function getDebLink(arch) {
   var version = chrome.runtime.getManifest().version;
-  var arch = "i386";
-  if (navigator.platform.includes("x86_64"))
+  if (arch == "x86-32")
+    arch = "i386";
+  else if (arch == "x86-64")
     arch = "amd64";
   else if (navigator.platform.includes("aarch64"))
     arch = "arm64";
-  else if (navigator.platform.includes("armv"))
+  else if (arch == "arm")
     arch = "armhf";
   return "https://launchpad.net/~s.noack/+archive/ubuntu/ppa/+files/chrome-blinklight_" + version + "_" + arch + ".deb";
 }
@@ -43,29 +44,29 @@ function initSettings(leds) {
   });
 }
 
-function init() {
+function getLeds() {
   chrome.runtime.sendMessage("get-leds", function(leds) {
-    if (leds) {
-      if (leds.length > 0) {
-        initSettings(leds);
-        document.documentElement.dataset.view = "settings";
-      } else
-        document.documentElement.dataset.view = "no-leds";
-    }
-    else if (!/^Linux\b/.test(navigator.platform) || /\bCrOS\b/.test(navigator.userAgent))
-      document.documentElement.dataset.view = "os-not-supported";
-    else {
+    if (!leds) {
       document.documentElement.dataset.view = "connection-failed";
-      setTimeout(init, 1000);
+      setTimeout(getLeds, 1000);
+    } else if (leds.length > 0) {
+      document.documentElement.dataset.view = "settings";
+      initSettings(leds);
+    } else {
+      document.documentElement.dataset.view = "no-leds";
     }
   });
 }
 
-init();
+chrome.runtime.getPlatformInfo(function(info) {
+  if (info.os != "linux")
+    document.documentElement.dataset.view = "os-not-supported";
+  else
+    getLeds();
+  document.getElementById("deb-link").href = getDebLink(info.arch);
+});
 
 document.addEventListener("change", function(event) {
   chrome.storage.local.set({[event.target.name]: event.target.value});
   checkLedError();
 }, true);
-
-document.getElementById("deb-link").href = getDebLink();
