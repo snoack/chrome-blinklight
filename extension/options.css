@@ -1,21 +1,37 @@
-html[data-view=settings] body {
+html[data-view=settings]:not(.firefox) body {
   margin-top: 0;
 }
 
-label {
-  white-space: nowrap;
+html.firefox {
+  font: message-box;
+  font-size: large;
+  color: #333;
+  line-height: 1.8em;
 }
 
+html.firefox #led {
+  width: 25em;
+  padding-right: 2em;
+}
+
+html.firefox #no-leds,
+html.firefox #os-not-supported,
+html.firefox #connection-failed,
 .error {
+  display: inline-block;
   background-color: #fee;
   border: 1px solid #faa;
   border-radius: 3px;
   padding: 0.4em 0.8em;
 }
 
+label {
+  white-space: nowrap;
+}
+
 #settings {
   display: flex;
-  flex-flow: column;
+  flex-wrap: wrap;
 }
 
 #leds {
@@ -31,7 +47,7 @@ html:not([data-view=settings]) #settings,
 html:not([data-view=no-leds]) #no-leds,
 html:not([data-view=os-not-supported]) #os-not-supported,
 html:not([data-view=connection-failed]) #connection-failed,
-#led:not([data-error=unkown]) #led-error-unknown,
+#led:not([data-error=unknown]) #led-error-unknown,
 #led:not([data-error=locked]) #led-error-locked {
   display: none;
 }

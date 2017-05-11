@@ -26,5 +26,11 @@
   },
   "minimum_chrome_version": "42",
   "manifest_version": 2,
+  "applications": {
+    "gecko": {
+      "id": "blinklight@snoack.addons.mozilla.org",
+      "strict_min_version": "50.0"
+    }
+  },
   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCprfGX9/itvOCSKlq82T3+YW6kuO/kuggH6AniK3tvfYz+pa4RFOLWxf7q60zWF3uYKzpJj2O3/zmH6FrjGy+cxWDvrChH4c45eTTZNC99l9Xz8/FBsupQHYUBP2FUiLnJ5eHAgAPjSOnAUQSfy+Jhi6fRCpTXX1bPQ8S4Henq4QIDAQAB"
 }

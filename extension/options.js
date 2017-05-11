@@ -70,3 +70,6 @@ document.addEventListener("change", function(event) {
   chrome.storage.local.set({[event.target.name]: event.target.value});
   checkLedError();
 }, true);
+
+if (typeof browser == "object")
+  document.documentElement.classList.add("firefox");

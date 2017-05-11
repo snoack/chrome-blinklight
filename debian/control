@@ -7,6 +7,6 @@ Standards-Version: 3.9.8
 Homepage: https://github.com/snoack/chrome-blinklight
 
 Package: chrome-blinklight
-Architecture: i386 amd64 arm64 armhf
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libcap2-bin
-Description: Chrome extension that notifies you about urgent tabs using one of your laptop's LEDs
+Description: Browser extension that notifies you about urgent tabs using one of your laptop's LEDs
