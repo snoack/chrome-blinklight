@@ -14,6 +14,7 @@ is minimized or on another workspace.
 
 In order to pin a tab, right click on the tab and choose "Pin tab".
 
+
 Installation
 ------------
 
@@ -60,6 +61,25 @@ Finally, install the extension for [Chrome][1] or [Firefox][2], if not done yet.
 During development, you can also load the extension directly from the
 `extension` subdirectory in the source tree, this however, is not recommended
 for normal usage.
+
+
+Testing
+-------
+
+The available LEDs in the options, are all LEDs exposed by the Linux kernel under
+`/sys/class/leds`. Not all of them might work, some LEDs are exposed by Linux
+even though they don't exist, or cannot be controlled in software, on your laptop.
+A bug in *blinklight* isn't entirely impossible too. Or you just might want to
+figure out the name of a particular LED, or vice-versa.
+
+The easiest way to test the configuration, is to run following code from
+the developer tools console. While the tab is pinned and in the background,
+this should generate an event that triggers the LED, once a second.
+
+```javascript
+setInterval(function() { document.title = Math.random(); }, 1000);
+```
+
 
 [1]: https://chrome.google.com/webstore/detail/blinklight/jiaipmkogklkpmpabagihfledlejmgaf
 [2]: https://addons.mozilla.org/en-US/firefox/addon/blinklight/
